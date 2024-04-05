@@ -1,14 +1,13 @@
 // routes/auth.js
 const express = require('express');
 const router = express.Router();
-const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 router.post('/signup', async (req, res) => {
     try {
         const { username, email, password } = req.body;
-        // Create a new user without hashing the password
+    
         const user = new User({ username, email, password });
         await user.save();
         res.status(201).json({ message: 'User created successfully', userId: user.userId });
