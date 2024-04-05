@@ -8,15 +8,14 @@ const User = require('../models/User');
 router.post('/signup', async (req, res) => {
     try {
         const { username, email, password } = req.body;
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const user = new User({ username, email, password: hashedPassword });
+        // Create a new user without hashing the password
+        const user = new User({ username, email, password });
         await user.save();
         res.status(201).json({ message: 'User created successfully', userId: user.userId });
     } catch (error) {
         res.status(500).json({ message: error.message });
     }
 });
-
 
 router.post('/login', async (req, res) => {
     try {
@@ -25,8 +24,8 @@ router.post('/login', async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-        const isValidPassword = await bcrypt.compare(password, user.password);
-        if (!isValidPassword) {
+        // Check password without bcrypt
+        if (user.password !== password) {
             return res.status(401).json({ message: 'Invalid password' });
         }
         const token = jwt.sign({ userId: user._id }, 'lksh2001', { expiresIn: '1h' });
@@ -35,6 +34,7 @@ router.post('/login', async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 });
+
 
 router.get('/user/:userId', async (req, res) => {
     try {
